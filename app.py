@@ -1,5 +1,5 @@
 import math
-from flask import Flask, flash, json, jsonify, redirect, render_template, request, url_for, session
+from flask import Flask, flash, jsonify, redirect, render_template, request, url_for, session
 import mysql.connector
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
