@@ -1,28 +1,41 @@
-import math
+# 🧱 Core Flask & Extensions
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for, session
-import mysql.connector
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-import re
-import io
-import parsedatetime as pdt
+
+# 🗃️ Database
+import mysql.connector
+
+# 📅 Scheduling & Time
 from datetime import datetime, timedelta
 from dateutil import parser as date_parser
-import base64
-from apscheduler.triggers.cron import CronTrigger
-from apscheduler.schedulers.background import BackgroundScheduler
-from apscheduler.triggers.interval import IntervalTrigger
 from dateutil.relativedelta import relativedelta
-from google_auth_oauthlib.flow import Flow
-import os
-import pickle
-from googleapiclient.discovery import build
+import parsedatetime as pdt
+from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
+from apscheduler.triggers.interval import IntervalTrigger
+
+# 📊 Analytics & Plots
+import matplotlib
+matplotlib.use('Agg')  # For non-GUI environments
+import matplotlib.pyplot as plt
+
+# 🧠 AI & Prediction
 from AI.suggestor import suggest_task_with_ml
 
+# 🔐 Auth & Google API
+from google_auth_oauthlib.flow import Flow
+from googleapiclient.discovery import build
+
+# 🛠️ Utilities
+import os
+import math
+import re
+import io
+import base64
+import pickle
 import logging
+
 logging.basicConfig(level=logging.INFO)
 
 # Initialize Flask App
@@ -44,20 +57,22 @@ bcrypt = Bcrypt(app)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'mail'
-app.config['MAIL_PASSWORD'] = 'password'
-app.config['MAIL_DEFAULT_SENDER'] = ('sender_name')
+app.config['MAIL_USERNAME'] = 'your-email@gmail.com'
+app.config['MAIL_PASSWORD'] = 'your-email-password'
+# You can just use a plain email or a tuple (Name, Email) if you want a display name
+# Example: 'your-email@gmail.com' OR ('TaskForge', 'your-email@gmail.com')
+app.config['MAIL_DEFAULT_SENDER'] = 'your-email@gmail.com'
 
 mail = Mail(app)
 
-
 scheduler = BackgroundScheduler()
 
-
+# Shows the dashboard
 @app.route('/')
 def dashboard():
     return render_template('dashboard.html')
-
+    
+# Main page
 @app.route('/index')
 def index():
     user_id = session.get('user_id')
@@ -67,7 +82,6 @@ def index():
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
 
-    # Fetch username first
     cursor.execute("SELECT username FROM users WHERE id = %s", (user_id,))
     user_data = cursor.fetchone()
     username = user_data['username'] if user_data else 'Unknown'
@@ -110,7 +124,6 @@ def index():
     """, (user_id, shared_per_page, shared_offset))
     shared_tasks = cursor.fetchall()
 
-    # Attach shared_with usernames to shared_tasks
     for task in shared_tasks:
         cursor.execute("""
             SELECT u.username FROM users u
@@ -120,7 +133,6 @@ def index():
         shared_users = cursor.fetchall()
         task['shared_with'] = [user['username'] for user in shared_users]
 
-    # Count total shared tasks for pagination
     cursor.execute("""
         SELECT COUNT(*) AS total FROM shared_tasks st
         JOIN shared_with_users swu ON st.id = swu.shared_task_id
@@ -129,7 +141,6 @@ def index():
     total_shared = cursor.fetchone()['total']
     shared_total_pages = math.ceil(total_shared / shared_per_page)
 
-    # Get unique categories
     cursor.execute("""
         SELECT DISTINCT category 
         FROM tasks 
@@ -137,7 +148,6 @@ def index():
     """, (user_id,))
     user_categories = [row['category'] for row in cursor.fetchall()]
 
-    # AI suggestions
     suggestions = suggest_task_with_ml(user_id, cursor)
 
     calendar_linked = os.path.exists('token.pkl')
@@ -153,6 +163,7 @@ def index():
         shared_page=shared_page, shared_total_pages=shared_total_pages,
     )
 
+# Gets only a few tasks at a time for the user (like page-by-page)
 def get_tasks_paginated(user_id, limit, offset):
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
@@ -165,7 +176,7 @@ def get_tasks_paginated(user_id, limit, offset):
     connection.close()
     return tasks
 
-
+# Returns the total number of tasks (used for pagination/count display)
 def get_total_task_count(user_id):
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
@@ -174,12 +185,12 @@ def get_total_task_count(user_id):
     cursor.close()
     connection.close()
     return total
-
+    
+# Fetches tasks that have been shared with the other user
 def get_shared_tasks(user_id):
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    # Get shared tasks where current user is involved
     cursor.execute("""
         SELECT st.* FROM shared_tasks st
         JOIN shared_with_users swu ON st.id = swu.shared_task_id
@@ -233,7 +244,7 @@ def register():
 
     return render_template('register.html')
 
-
+# To send in-app reminders
 def send_due_reminders():
     with app.app_context():
         connection = mysql.connector.connect(**db_config)
@@ -261,27 +272,27 @@ def send_due_reminders():
             exists = cursor.fetchone()['count']
 
             if exists == 0:
-                # ✅ Insert in-app notification
+                # Insert in-app notification
                 cursor.execute("""
                     INSERT INTO notifications (user_id, message, created_at, is_read)
                     VALUES (%s, %s, %s, 0)
                 """, (task['user_id'], f"⏰ {task['description']} is due!", now))
 
-                # ✅ Send email reminder
+                # Send email reminder
                 msg = Message("⏰ Task Reminder!",
                               sender=("TaskForge", "taskforge971@gmail.com"),
                               recipients=[task['email']])
                 msg.body = f"Reminder: You have a task - {task['description']}."
                 mail.send(msg)
 
-                # ✅ Clear reminder to avoid repeat
+                # Clear reminder to avoid repeat
                 cursor.execute("UPDATE tasks SET reminder_datetime = NULL WHERE id = %s", (task['id'],))
 
         connection.commit()
         cursor.close()
         connection.close()
 
-
+# For login
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -341,14 +352,13 @@ def forgot_password():
 
     return render_template('forgot_password.html')
 
-
+#Logout Route
 @app.route('/logout', methods=['POST', 'GET'])
 def logout():
-    session.pop('user_id', None)  # Remove user session
+    session.pop('user_id', None)
     flash('You have been logged out.', 'info')
-    return redirect(url_for('dashboard'))  # Redirect to the homepage (dashboard)
-
-
+    return redirect(url_for('dashboard'))
+    
 # Add tasks
 @app.route('/add_task', methods=['GET', 'POST'])
 def add_task():
@@ -360,7 +370,7 @@ def add_task():
         description = request.form['description']
         due_datetime = request.form.get('due_datetime', None)
         category = request.form.get('category', 'General')
-        priority = request.form.get('priority', 'Medium')  # Default priority if none selected
+        priority = request.form.get('priority', 'Medium')
         reminder_str = request.form.get('reminder_datetime') 
         recurring = request.form.get('recurring') or None
         user_id = session['user_id']
@@ -386,14 +396,12 @@ def add_task():
         finally:
             cursor.close()
             connection.close()
-
-
+            
         return redirect(url_for('index'))
 
     return render_template('index.html')
-
-
-@app.route('/category/<string:category>')
+    
+# For category page
 @app.route('/category/<string:category>')
 def category(category):
     user_id = session.get('user_id')
@@ -414,6 +422,7 @@ def category(category):
 
     return render_template('category_tasks.html', tasks=tasks, category=category)
 
+#Daily add section
 @app.route('/add_daily_task', methods=['POST', 'GET'])
 def add_daily_task():
     if 'user_id' not in session:
@@ -439,7 +448,7 @@ def add_daily_task():
 
     return redirect(url_for('show_daily_tasks'))
 
-
+# Show daily tasks
 @app.route('/show_daily_tasks')
 def show_daily_tasks():
     user_id = session.get('user_id')
@@ -449,28 +458,25 @@ def show_daily_tasks():
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
 
-    # 🔹 Get incomplete daily tasks
+    #  Get incomplete daily tasks
     cursor.execute("SELECT * FROM daily_tasks WHERE user_id = %s AND status = 0", (user_id,))
     daily_tasks = cursor.fetchall()
 
-    # 🔹 Count total daily tasks
+    #  Count total daily tasks
     cursor.execute("SELECT COUNT(*) AS count FROM daily_tasks WHERE user_id = %s", (user_id,))
     total_tasks_today = cursor.fetchone()['count'] or 0
 
-    # 🔹 Count completed daily tasks
+    #  Count completed daily tasks
     cursor.execute("SELECT COUNT(*) AS count FROM daily_tasks WHERE user_id = %s AND status = 1", (user_id,))
     completed_today = cursor.fetchone()['count'] or 0
 
-    # 🔹 Calculate progress
+    #  Calculate progress
     progress_percent = int((completed_today / total_tasks_today) * 100) if total_tasks_today else 0
-
-    # 🔹 Generate pie chart
     pie_chart = create_pie_chart(progress_percent)
 
     cursor.close()
     connection.close()
-
-    # 🔹 Render with all stats
+    
     return render_template(
         'daily_tasks.html',
         daily_tasks=daily_tasks,
@@ -490,6 +496,7 @@ def clear_daily_tasks():
     print("✅ Daily tasks cleared at midnight.")
     logging.info(f"[{datetime.now()}] ✅ Cleared daily_tasks table.")
 
+# Delete tasks
 @app.route('/delete_task/<int:task_id>', methods=['POST', 'GET'])
 def delete_task(task_id):
     user_id = session.get('user_id')
@@ -501,7 +508,6 @@ def delete_task(task_id):
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
 
-    # If not found in daily_tasks, try in tasks table
     cursor.execute("SELECT * FROM tasks WHERE id = %s AND user_id = %s", (task_id, user_id))
     task = cursor.fetchone()
 
@@ -518,6 +524,7 @@ def delete_task(task_id):
     connection.close()
     return redirect(url_for('index'))
 
+# Edit tasks
 @app.route('/edit-task/<int:task_id>', methods=['GET', 'POST'])
 def edit_task(task_id):
     if 'user_id' not in session:
@@ -559,7 +566,7 @@ def edit_task(task_id):
         flash("Task updated successfully!", "success")
         return redirect(url_for('index'))
 
-    # GET request: fetch all tasks + the task to edit
+    # fetch all tasks + the task to edit
     cursor.execute("SELECT * FROM tasks WHERE user_id = %s", (session['user_id'],))
     all_tasks = cursor.fetchall()
 
@@ -573,10 +580,9 @@ def edit_task(task_id):
         flash("Task not found or you don't have permission to edit it.", "danger")
         return redirect(url_for('index'))
 
-    # Pass all tasks for listing, and the one task to edit to prefill modal
     return render_template('index.html', tasks=all_tasks, edit_task=task_to_edit)
 
-
+# Mark tasks as completed
 @app.route('/mark-completed/<int:task_id>', methods=['POST', 'GET'])
 def mark_completed(task_id):
     user_id = session.get('user_id')
@@ -588,7 +594,6 @@ def mark_completed(task_id):
 
     completed_at = datetime.now()
 
-
     cursor.execute('UPDATE tasks SET status = 1, completed_at = %s WHERE id = %s', (completed_at, task_id))
     connection.commit()
 
@@ -597,6 +602,7 @@ def mark_completed(task_id):
 
     return redirect(url_for('index'))
 
+# Mark daily tasks completed
 @app.route('/daily_mark_completed/<int:task_id>', methods=['POST'])
 def daily_mark_completed(task_id):
     if 'user_id' not in session:
@@ -613,6 +619,7 @@ def daily_mark_completed(task_id):
 
     return redirect(url_for('show_daily_tasks'))
 
+# Delete daily tasks
 @app.route('/delete_daily_task/<int:task_id>', methods=['GET', 'POST'])
 def delete_daily_task(task_id):
     if 'user_id' not in session:
@@ -636,7 +643,7 @@ def delete_daily_task(task_id):
     connection.close()
     return redirect(url_for('show_daily_tasks'))
 
-
+# Show completed tasks
 @app.route('/completed_tasks', methods=['POST', 'GET'])
 def completed_tasks():
     user_id = session.get('user_id')
@@ -660,7 +667,7 @@ def completed_tasks():
 
     return render_template('completed_tasks.html', tasks=completed_tasks, daily_completed_tasks=daily_completed_tasks)
 
-
+# Pie chart
 def create_pie_chart(progress_percent):
     remaining = 100 - progress_percent
     colors = ['#4caf50', '#e0e0e0']
@@ -671,7 +678,7 @@ def create_pie_chart(progress_percent):
         [progress_percent, remaining],
         colors=colors,
         startangle=90,
-        wedgeprops={'width': 0.4},  # Doughnut style
+        wedgeprops={'width': 0.4},
     )
     ax.axis('equal')
 
@@ -685,30 +692,28 @@ def create_pie_chart(progress_percent):
 
     return chart_base64
 
+# Create Shared tasks route
 @app.route('/create_shared_task', methods=['POST'])
 def create_shared_task():
     description = request.form.get('description')
     due_date = request.form.get('due_date')
     due_time = request.form.get('due_time')
     current_user_id = session.get("user_id")
-    user_ids = request.form.getlist('shared_with[]')  # this gives you a list automatically
-    priority = request.form.get('priority', 'Medium')  # default Medium if none
+    user_ids = request.form.getlist('shared_with[]') 
+    priority = request.form.get('priority', 'Medium')
     if not description:
         return "Description is required", 400
 
-    # Add current user if not already in shared list
     if str(current_user_id) not in user_ids:
         user_ids.append(str(current_user_id))
 
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
 
-    # Insert the shared task once (only one row!)
     cursor.execute("INSERT INTO shared_tasks (description, due_date, due_time, priority) VALUES (%s, %s, %s, %s)", (description, due_date or None, due_time or None, priority))
 
-    task_id = cursor.lastrowid  # 🔑 get the ID of the inserted shared_task
+    task_id = cursor.lastrowid 
 
-    # Now insert into a junction table, like `shared_with_users`
     for uid in user_ids:
         cursor.execute("INSERT INTO shared_with_users (shared_task_id, user_id) VALUES (%s, %s)", (task_id, uid))
 
@@ -718,7 +723,7 @@ def create_shared_task():
 
     return redirect(url_for('shared_tasks'))
 
-
+# Show shared tasks
 @app.route('/shared_tasks', methods=['POST', 'GET'])
 def shared_tasks():
     user_id = session.get("user_id")
@@ -728,11 +733,9 @@ def shared_tasks():
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor(dictionary=True)
 
-    # Get all other users (to show in dropdown)
     cursor.execute("SELECT * FROM users WHERE id != %s", (user_id,))
     all_users = cursor.fetchall()
-
-    # Get shared tasks where current user is involved
+    
     cursor.execute("""
         SELECT st.* FROM shared_tasks st
         JOIN shared_with_users swu ON st.id = swu.shared_task_id
@@ -740,7 +743,7 @@ def shared_tasks():
         ORDER BY st.id DESC
     """, (user_id,))
     shared_tasks = cursor.fetchall()
-    # 🔄 For each task, fetch shared usernames
+
     for task in shared_tasks:
         cursor.execute("""
             SELECT u.username FROM users u
@@ -757,7 +760,7 @@ def shared_tasks():
     return render_template("shared_tasks.html",all_users=all_users,shared_tasks=shared_tasks,
         current_user_id=user_id,show_popup=show_popup,search_query=search_query)
 
-
+# To search user for share tasks
 @app.route('/search_users')
 def search_users():
     query = request.args.get('query')
@@ -771,7 +774,7 @@ def search_users():
 
     return jsonify(users)
 
-
+# Show completed shared tasks
 @app.route('/complete_shared_task/<int:task_id>', methods=['POST'])
 def complete_shared_task(task_id):
     user_id = session.get("user_id")
@@ -786,7 +789,7 @@ def complete_shared_task(task_id):
 
     return redirect(url_for('shared_tasks'))
 
-
+# Delete shared tasks
 @app.route('/delete_shared_task/<int:task_id>', methods=['POST'])
 def delete_shared_task(task_id):
     user_id = session.get("user_id")
@@ -794,28 +797,24 @@ def delete_shared_task(task_id):
     conn = mysql.connector.connect(**db_config)
     cursor = conn.cursor()
 
-    # Step 1: Check if the user is part of the task
     cursor.execute("""
         SELECT * FROM shared_with_users 
         WHERE shared_task_id = %s AND user_id = %s
     """, (task_id, user_id))
 
     if cursor.fetchone():
-        # Step 2: Remove the user's association with the task
         cursor.execute("""
             DELETE FROM shared_with_users 
             WHERE shared_task_id = %s AND user_id = %s
         """, (task_id, user_id))
         conn.commit()
-
-        # Step 3: Check if anyone else is still linked to this task
+        
         cursor.execute("""
             SELECT COUNT(*) FROM shared_with_users 
             WHERE shared_task_id = %s
         """, (task_id,))
         count = cursor.fetchone()[0]
 
-        # Step 4: If no one else is linked, delete the task entirely
         if count == 0:
             cursor.execute("DELETE FROM shared_tasks WHERE id = %s", (task_id,))
             conn.commit()
@@ -823,8 +822,6 @@ def delete_shared_task(task_id):
     cursor.close()
     conn.close()
     return redirect(url_for('shared_tasks'))
-
-# FOR AI FEATURES
 
 # Flask route to show suggestions
 @app.route('/suggest')
@@ -844,7 +841,6 @@ def show_suggestion():
 
     return render_template("index.html", suggestions=suggestions)
 
-
 # Flask route to add suggested task
 @app.route('/add_suggested_task', methods=['POST'])
 def add_suggested_task():
@@ -856,7 +852,7 @@ def add_suggested_task():
     description = request.form.get('description')
     category = request.form.get('category', 'General')
     priority = request.form.get('priority', 'Medium')
-    due_datetime = request.form.get('due_datetime')  # Will be None if not passed
+    due_datetime = request.form.get('due_datetime')
 
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
@@ -875,6 +871,7 @@ def add_suggested_task():
 
 cal = pdt.Calendar()
 
+# Process the voice of the user
 @app.route('/process-voice', methods=['POST'])
 def process_voice():
     data = request.get_json()
@@ -938,8 +935,7 @@ def process_voice():
     # Validate description
     if not description:
         return jsonify({"status": "error", "message": "Description missing"})
-
-    # Save task to DB (add reminder_datetime and recurring columns in your DB accordingly)
+        
     user_id = session.get('user_id')
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor()
@@ -953,7 +949,7 @@ def process_voice():
 
     return jsonify({"status": "ok"})
 
-
+# checking if there are any task due to send reminders
 def check_and_send_reminders():
     now = datetime.now()
     soon = now + timedelta(minutes=5)
@@ -973,9 +969,7 @@ def check_and_send_reminders():
     for task in tasks:
         print(f"Reminder: Task '{task['description']}' is due soon!")
 
-# Example: you can call this function every 5 minutes via cron or APScheduler
-
-
+# Handles recurring tasks
 def handle_recurring_tasks():
     with app.app_context():
         connection = mysql.connector.connect(**db_config)
@@ -1002,20 +996,12 @@ def handle_recurring_tasks():
             elif task['recurring'] == 'monthly':
                 new_due += relativedelta(months=1)
             else:
-                continue  # skip unknown values
-
-            # Insert the new recurring task
+                continue
+                
             cursor.execute("""
                 INSERT INTO tasks (user_id, description, category, priority, due_datetime, recurring, status)
                 VALUES (%s, %s, %s, %s, %s, %s, 0)
-            """, (
-                task['user_id'],
-                task['description'],
-                task['category'],
-                task['priority'],
-                new_due,
-                task['recurring']
-            ))
+            """, (task['user_id'], task['description'], task['category'], task['priority'], new_due, task['recurring']))
 
         connection.commit()
         cursor.close()
@@ -1023,7 +1009,7 @@ def handle_recurring_tasks():
 
         logging.info(f"[{datetime.now()}] 🔁 Recurring tasks processed.")
 
-
+# Resets daily tasks after 12
 def daily_reset():
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
@@ -1035,10 +1021,8 @@ def daily_reset():
     today = datetime.now().date()
 
     if last_reset != today:
-        # Clear daily tasks
         clear_daily_tasks()
-        # Create new recurring daily tasks (if needed)
-        handle_recurring_tasks()  # or custom logic here
+        handle_recurring_tasks() 
         # Update last reset
         cursor.execute("UPDATE system_state SET last_reset_date = %s WHERE id = 1", (today,))
         connection.commit()
@@ -1046,7 +1030,7 @@ def daily_reset():
     cursor.close()
     connection.close()
 
-
+# To get reminders
 @app.route('/get_reminders')
 def get_reminders():
     user_id = session.get('user_id')
@@ -1073,7 +1057,7 @@ def get_reminders():
 
     return jsonify(reminders)
 
-
+# Marking notifications
 @app.route('/mark_notifications_read', methods=['POST'])
 def mark_notifications_read():
     user_id = session.get('user_id')
@@ -1093,7 +1077,7 @@ def mark_notifications_read():
     return '', 204
 
 with app.app_context():
-    # 🕛 Job 1: Clear daily tasks at midnight
+    # Clear daily tasks at midnight
     scheduler.add_job(
         clear_daily_tasks,
         CronTrigger(hour=0, minute=0),
@@ -1101,7 +1085,7 @@ with app.app_context():
         replace_existing=True
     )
 
-    # 🔁 Job 2: Handle recurring tasks at midnight
+    # Handles recurring tasks at midnight
     scheduler.add_job(
         handle_recurring_tasks,
         CronTrigger(hour=0, minute=0),
@@ -1109,7 +1093,7 @@ with app.app_context():
         replace_existing=True
     )
 
-    # ⏰ Job 3: Check and send due reminders every 1 minute
+    # Check and send due reminders every 1 minute
     scheduler.add_job(
         send_due_reminders,
         IntervalTrigger(minutes=1),
@@ -1119,11 +1103,12 @@ with app.app_context():
 
     scheduler.start()
 
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1' # Allows OAuth to work over HTTP (for development only, not secure for production)
 
-SCOPES = ['https://www.googleapis.com/auth/calendar.events']
-CLIENT_SECRETS_FILE = 'google_calendar_credentials.json'
+SCOPES = ['https://www.googleapis.com/auth/calendar.events'] # Permission scope to create and manage calendar events using Google Calendar API
+CLIENT_SECRETS_FILE = 'google_calendar_credentials.json' # Path to your Google OAuth 2.0 credentials JSON file
 
+# Sends the user to Google to ask for permission to access their account.
 @app.route('/authorize')
 def authorize():
     flow = Flow.from_client_secrets_file(
@@ -1138,7 +1123,8 @@ def authorize():
     )
     session['state'] = state
     return redirect(authorization_url)
-
+    
+# After Google gives access, this gets the info and sends user back.
 @app.route('/oauth2callback')
 def oauth2callback():
     state = session['state']
@@ -1154,8 +1140,9 @@ def oauth2callback():
     with open('token.pkl', 'wb') as token_file:
         pickle.dump(credentials, token_file)
 
-    return redirect(url_for('index'))  # or wherever you want after login
-
+    return redirect(url_for('index'))
+    
+# Syncing with google calender
 def add_to_google_calendar(summary, start_time):
     try:
         with open('token.pkl', 'rb') as token:
@@ -1181,12 +1168,14 @@ def add_to_google_calendar(summary, start_time):
     except Exception as e:
         print("❌ Google Calendar error:", e)
         return False
-
+        
+# Suggests a task time that's 1 hour from now
 def suggest_task_time():
     now = datetime.now()
     suggested_time = now + timedelta(hours=1)
     return suggested_time.strftime('%Y-%m-%dT%H:%M:%S')
-
+    
+# Predicts the next task value based on previous progress
 def simple_task_prediction(data):
     days = list(data.values())
     diffs = [days[i+1] - days[i] for i in range(len(days)-1)]
@@ -1196,6 +1185,7 @@ def simple_task_prediction(data):
     predicted = max(0, days[-1] + avg_change)
     return round(predicted)
 
+# Get weekly statistics
 def get_weekly_stats():
     connection = mysql.connector.connect(**db_config)
     cursor = connection.cursor(dictionary=True)
@@ -1268,7 +1258,7 @@ def get_weekly_stats():
 
     return data, insight
 
-
+# Shows weekly analytics
 @app.route('/weekly-analytics')
 def weekly_analytics():
     data, insights = get_weekly_stats()
@@ -1276,4 +1266,4 @@ def weekly_analytics():
 
 if __name__ == "__main__":
     daily_reset()
-    app.run(debug=True, use_reloader=False)  # 🔒 No reloader = no duplicate jobs
+    app.run(debug=True, use_reloader=False) 
