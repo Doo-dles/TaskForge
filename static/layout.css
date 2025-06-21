@@ -1,0 +1,1525 @@
+/* ✅ NAVBAR STYLES */
+nav {
+    background-color: #ffe4e1;
+    color: white;
+    padding: 15px 20px;
+    position: relative;
+    width: 100%;
+    top: 0;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 💥 this makes spacing easier */
+    box-sizing: border-box;
+}
+
+ .navbar {
+    background-color: #ccc;  /* Grey Background */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Left side: Logo & Title */
+
+.navbar-left {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-logo {
+    height: 30px; /* or ever fits your navbar */
+    margin-right: 10px;
+}
+
+.navbar-title {
+    font-size: 20px;
+    font-weight: bold;
+    color: #e0849e;
+}
+
+
+/* Right side: Links */
+.navbar-right {
+    display: flex;
+    align-items: center;
+}
+
+.navbar-right a {
+    text-decoration: none;
+    color: black;
+    font-size: 16px;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+.navbar-right a:hover {
+    background-color: #aaa; /* Darker Grey on Hover */
+}
+
+
+/* Logout Button */
+.logout-btn {
+    background: red;
+    color: white !important;
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+.logout-btn:hover {
+    background: darkred;
+}
+
+.mic-btn {
+    background-color: transparent;
+    color: #e09fb1;
+    border: none;
+    padding: 8px 15px;
+    margin-right: 10px; /* Space between mic and logout */
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 25px;
+    transition: background-color 0.3s ease;
+    white-space: nowrap;
+}
+
+.mic-btn:hover {
+    color: #ec8ea9;
+}
+
+/* Optional: icon size */
+/* .mic-btn i {
+    pointer-events: none; /* so clicks register on the button 
+    font-size: 22px;
+} */
+
+
+/* If you're viewing this on mobile or smaller screens, 
+consider wrapping the whole navbar in a responsive container */
+@media (max-width: 768px) {
+    .logout-btn {
+        padding: 6px 10px;
+        font-size: 14px;
+    }
+
+    .navbar-title {
+        font-size: 16px;
+    }
+}
+
+.voice-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.6);
+}
+
+.voice-box {
+    background: white;
+    margin: 15% auto;
+    padding: 25px;
+    width: 90%;
+    max-width: 500px;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.voice-actions {
+    margin-top: 20px;
+}
+
+.voice-btn, .cancel-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 0 8px;
+    cursor: pointer;
+}
+
+.voice-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.cancel-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+
+/* Footer */
+
+footer {
+    background-color: #222;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+}
+.footer-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+}
+.footer-section {
+    flex: 1;
+    margin: 10px;
+}
+.footer-section h3 {
+    color: #ffcc00;
+}
+.footer-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-section ul li {
+    margin: 8px 0;
+}
+
+.footer-section ul li a {
+    color: #bbb;
+    text-decoration: none;
+}
+
+.footer-section ul li a:hover {
+    color: #ffcc00;
+}
+
+.footer-bottom {
+    margin-top: 20px;
+    border-top: 1px solid #444;
+    padding-top: 10px;
+    font-size: 14px;
+}
+
+.footer-section img {
+    width: 25px;
+    margin: 0 5px;
+}
+
+.follow {
+    color: white;
+    text-decoration: none;
+}
+.follow:hover {
+    color: grey;
+}
+
+/* For category */
+
+/* Category toggle icon next to TaskForge title */
+
+/* Sliding Category Bar */
+
+.category-bar {
+    position: absolute;
+    top: 60px; /* Adjust based on your navbar height */
+    left: 160px; /* Adjust based on where your 📂 icon is */
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    background: none;
+    padding: 10px 0px;
+    transform: translateX(-100%);
+    white-space: nowrap;
+    opacity: 0;
+    transition: transform 0.4s ease-in-out, opacity 0.3s ease;
+    display: flex;
+    z-index: 10000; /* above everything */
+}
+
+.category-bar.show {
+    transform: translateX(0);
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.inline-category-bar {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    overflow-x: auto;
+/*     padding-left: 10px; */
+    opacity: 0;
+    max-width: 0;
+    transform: translateX(-20px);
+    transition: all 0.4s ease;
+    white-space: nowrap;
+    visibility: hidden;
+}
+
+/* When shown */
+.inline-category-bar.show {
+    opacity: 1;
+    max-width: 1000px; /* enough space for categories */
+    transform: translateX(0);
+    visibility: visible;
+}
+
+
+/* Category buttons */
+.category-item {
+    position: relative;
+    padding: 6px 14px;
+    padding-bottom: 4px;
+    color: #fff;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s;
+}
+
+.category-item:hover {
+    background-color: #eee;
+}
+
+.category-toggle {
+    margin-left: 15px;
+    background: none;
+    padding: 8px 10px;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+}
+/*  */
+
+.category-bar.active {
+    display: flex;
+}
+.navbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+}
+
+.category-icon:hover {
+    transform: scale(1.2);
+}
+
+/* End of categories */
+
+/* End of layout */
+
+
+/* For Dashboard */
+
+/* Background image styling */
+.welcome-bg {
+    background-image: url('../static/images/for_background.png'); /* Add your image in static/images */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Main container */
+.welcome-container {
+    background:transparent;
+    padding: 40px 60px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    border: 1px solid #333;
+}
+
+/* Welcome text */
+.welcome-container h1 {
+    font-size: 36px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.highlight {
+    color: #91bfe0;
+}
+
+/* Buttons */
+.btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.welcome-btn {
+    text-decoration: none;
+    padding: 12px 20px;
+    background-color: #e0aab8;
+    color: white;
+    font-weight: bold;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+
+.welcome-btn:hover {
+    background-color: #d27890;
+}
+
+
+/* Apply to the login page */
+.styled-label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    color: #333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    width: 100%;          
+    max-width: 400px;     
+    padding: 14px 16px;  
+}
+
+.styled-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.8px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease;
+    }
+
+.styled-input:focus {
+    outline: none;
+    border-color: #0d6efd;
+    box-shadow: 0 0 6px rgba(13, 110, 253, 0.4);
+    }
+
+.styled-link {
+    color: #333;
+}
+
+.styled-link:hover {
+    color: black;
+}
+
+/* End of login.html */
+
+/* for index.html */
+
+/* SECTIONS LEFT AND RIGHT*/
+
+.main-dashboard {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    margin-top: -40px;
+    align-items: flex-start;
+}
+
+.left-section {
+    flex: 2;
+    padding: 1rem;
+    box-sizing: border-box;
+}
+
+.right-section {
+    flex: 1;
+    padding: 1rem;
+    background: #f8f8f8;
+    border-left: 2px solid #ddd;
+    border-radius: 8px;
+    height: fit-content;
+    position: sticky;
+}
+
+.progress-bar {
+    height: 20px;
+    background: #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #4caf50;
+    width: 70%;
+    transition: width 0.4s ease-in-out;
+}
+
+.motivation-quote {
+    margin: 20px 0;
+    background: #c5afd7;
+    padding: 10px 15px;
+    border-left: 5px solid #3a345b;
+    border-radius: 5px;
+    font-style: italic;
+    color: white;
+}
+
+.stat-item {
+    margin-bottom: 15px;
+}
+
+.tasks-wrapper {
+    background: #e6b4c0;
+    padding: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-top: 20px;
+}
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    margin-bottom: 1rem;
+    gap: 0.5rem;
+}
+
+.filter-container select {
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 14px;
+    background-color: #fdfdfd;
+    cursor: pointer;
+}
+
+/* Right Panel */
+.dashboard-right {
+    width: 30%;
+    background-color: #dad8e8;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0,0,0,0.1);
+    box-sizing: border-box;
+}
+
+.progress-chart {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.progress-chart h4 {
+    margin-bottom: 15px;
+    font-size: 18px;
+    color: #333;
+}
+
+.progress-chart img {
+    width: 150px;
+    height: 150px;
+    object-fit: contain;
+}
+
+.progress-percent-text {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: bold;
+    color: #4caf50;
+    font-size: 16px;
+}
+
+/* For priority labels */
+
+.priority-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.priority-btn {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.priority-btn:hover {
+  transform: translateY(-4px); /* moves it up */
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15); /* subtle shadow */
+  cursor: pointer;
+}
+
+.priority-btn.selected {
+  outline: 1px solid #000;
+  /* box-shadow: 0 0 10px 3px rgba(0,0,0,0.5); */
+  transform: translateY(-6px) scale(1.1);
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide radio buttons */
+.priority-btn input[type="radio"] {
+    display: none;
+}
+
+/* Background colors */
+.priority-btn.urgent {
+    background-color: #931a23;
+}
+
+.priority-btn.high {
+    background-color: #fb6f92;
+}
+
+.priority-btn.medium {
+    background-color: #f29f05;
+}
+
+.priority-btn.low {
+    background-color: #79d1c8;
+}
+
+/* Highlight selected */
+.priority-btn input[type="radio"]:checked + label,
+.priority-btn input[type="radio"]:checked {
+    outline: 2px solid #000;
+}
+
+/* Alternative way - style label when input is checked */
+.priority-btn input[type="radio"]:checked + label,
+.priority-btn input[type="radio"]:checked {
+    opacity: 1;
+}
+/* Use label:has(input:checked) if supported or JS */
+
+.priority-btn input[type="radio"]:checked + span {
+    font-weight: bold;
+}
+
+/* Instead: add active style to label when its input is checked */
+.priority-btn input[type="radio"]:checked {
+    box-shadow: 0 0 5px 2px #000;
+}
+
+.recurring-options {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.recurring-btn {
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    user-select: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.recurring-btn:hover {
+  transform: translateY(-4px); /* moves it up */
+  box-shadow: 0 8px 12px rgba(0,0,0,0.15); /* subtle shadow */
+  cursor: pointer;
+}
+
+.recurring-btn.selected {
+  outline: 1px solid #000;
+  transform: translateY(-6px) scale(1.1);
+  position: relative;
+  z-index: 1;
+}
+
+/* Hide radio buttons */
+.recurring-btn input[type="radio"] {
+    display: none;
+}
+
+/* Background colors */
+.recurring-btn.none {
+    background-color: #c6ccd2; /* Light grey */
+    color: black;
+}
+
+.recurring-btn.daily {
+    background-color: #4caf50; /* Green */
+    color: black;
+}
+
+.recurring-btn.weekly {
+    background-color: #2196f3; /* Blue */
+    color: black;
+}
+
+.recurring-btn.monthly {
+    background-color: #ff9800; /* Orange */
+    color: black;
+}
+
+
+/* Container for the dropdown */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* The dots button */
+.dots-btn {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: #555;
+  padding: 5px 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+
+.dots-btn:hover {
+  background-color: #f0f0f0;
+  color: #000;
+}
+
+/* Dropdown menu (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0; /* align right side */
+  background-color: #fff;
+  min-width: 140px;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  border-radius: 8px;
+  z-index: 1000;
+  padding: 8px 0;
+  user-select: none;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Buttons inside dropdown */
+.dropdown-content button,
+.dropdown-content form button {
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 10px 20px;
+  text-align: left;
+  font-size: 14px;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 0;
+}
+
+.dropdown-content button:hover,
+.dropdown-content form button:hover {
+  background-color: #007bff;
+  color: white;
+  border-radius: 8px;
+}
+
+/* Remove default button outline on focus */
+.dropdown-content button:focus,
+.dropdown-content form button:focus {
+  outline: none;
+  background-color: #0056b3;
+  color: white;
+  border-radius: 8px;
+}
+
+/* END */
+
+/* For daily tasks section */
+
+.daily-tasks-container {
+    background: #ffb7af;
+    border-radius: 12px;
+    padding: 25px 30px;
+    margin: 40px auto;
+    max-width: 600px;
+    box-shadow: 0 0 12px rgba(0,0,0,0.1);
+}
+
+.daily-tasks-container h2 {
+    margin-bottom: 20px;
+    font-size: 22px;
+    color: #333;
+}
+
+.add-task-form {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+}
+
+.add-task-form input[type="text"] {
+    flex-grow: 1;
+    padding: 5px 15px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.task-item input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    accent-color: #007bff; /* Optional: gives it a blue color */
+    margin-right: 10px;
+}
+
+.add-task-btn {
+    background: #c5afd7;
+    padding: 10px 20px;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s;
+}
+
+.daily-task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.task-desc {
+    flex-grow: 1;
+    font-size: 16px;
+    color: #333;
+    margin-top: 8px;
+}
+
+.task-desc.completed {
+    text-decoration: line-through;
+    color: #aaa;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    color: #e1688b;
+    margin-top: 8px;
+}
+
+
+/* end for daily tasks section */
+
+.tasks-container {
+    padding: 20px 30px;
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    scroll-behavior: smooth;
+}
+
+/* Optional: make scrollbar prettier */
+.tasks-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.tasks-container::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 10px;
+}
+
+.task-row {
+    display: flex;
+    align-items: center;
+    background-color: #f9f9f9;
+    margin-bottom: 12px;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    transition: background 0.2s ease;
+}
+
+.task-row:hover {
+    background-color: #f1f1f1;
+}
+
+.task-row input[type="checkbox"] {
+    margin-right: 20px;
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* Task Description */
+.task-desc {
+    flex: 1;
+    font-size: 16px;
+    color: #333;
+}
+
+.task-meta {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-left: 20rem; /* keep your existing margin */
+}
+
+/* Due Date styling */
+.task-date {
+    min-width: auto;
+    padding: 5px 10px;
+    font-size: 13px;
+    background-color: #e0e0e0; /* light grey */
+    border-radius: 12px;
+    color: #333;
+    white-space: nowrap;
+}
+
+/* Priority label styling */
+.priority-label {
+    min-width: auto;
+    padding: 5px 10px;
+    font-size: 13px;
+    border-radius: 12px;
+    font-weight: bold;
+    white-space: nowrap;
+    display: inline-block;
+    text-align: center;
+    /* default color */
+    color: white;
+}
+
+/* Priority colors */
+.priority-label.urgent {
+    background-color: #931a23; /* blue */
+}
+.priority-label.high {
+    background-color: #fb6f92; /* red */
+}
+.priority-label.medium {
+    background-color: #ffeda2; /* yellow */
+    color: #f29f05;
+}
+.priority-label.low {
+    background-color: #79d1c8; /* grey */
+}
+
+/* Delete Button */
+.task-actions {
+    min-width: 50px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.task-actions button {
+    background: none;
+    border: none;
+    color: #e63946;
+    font-size: 16px;
+    cursor: pointer;
+    padding: 6px;
+}
+
+.task-actions button:hover {
+    color: #b21f2d;
+}
+
+.completed-task {
+    opacity: 0.5;
+    text-decoration: line-through;
+}
+
+.in-a {
+    display: inline-block;
+    text-decoration: none;
+    margin-right: 10px; /* Adjust spacing */
+}
+
+/* Dots Button */
+.dots-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+    padding: 5px;
+    position: relative;
+}
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown content */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    right: 0;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    z-index: 100;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Dropdown links/buttons */
+.dropdown-content a,
+.dropdown-content button {
+    color: #333;
+    padding: 10px 16px;
+    text-decoration: none;
+    display: block;
+    background: none;
+    border: none;
+    width: 100%;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* Hover effect */
+.dropdown-content a:hover,
+.dropdown-content button:hover {
+    background-color: #f0f0f0;
+}
+
+
+/* 🌟 Floating Button */
+.floating-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background-color: #007bff;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    cursor: pointer;
+    z-index: 10000; /* SUPER high z-index to stay above all */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+}
+
+.floating-btn:hover {
+    background-color: #0056b3;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7);
+    }
+    70% {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 10px rgba(0, 123, 255, 0);
+    }
+    100% {
+        transform: scale(1);
+        box-shadow: 0 0 0 0 rgba(0, 123, 255, 0);
+    }
+}
+
+.floating-btn {
+    animation: pulse 2s infinite;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 9999; /* higher than navbar */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-toggle:checked ~ .modal {
+    display: flex;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 10px;
+    border-radius: 8px;
+    width: 90%;
+    z-index: 10000;
+    max-width: 450px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+    position: relative;
+    animation: slideDown 0.3s ease-in-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-title {
+    font-size: 20px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+    text-align: center;
+    color: #333;
+}
+
+.task-form label {
+    display: block;
+    font-weight: bold;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.task-form textarea,
+.task-form input[type="text"],
+.task-form input[type="datetime-local"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 14px;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.submit-btn {
+    margin-top: 20px;
+    background: #e86975;
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: bold;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.submit-btn:hover {
+    background-color: #fbb2bb;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 14px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+    transition: color 0.3s;
+}
+
+.close-btn:hover {
+    color: #000;
+}
+
+/* 🌟 Form Styling */
+form input, form textarea {
+    width: 100%;
+    padding: 8px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+
+/* End of index.html */
+
+/* NOTIFICATONS */
+.notification-container {
+    position: relative;
+}
+
+.notification-btn {
+    background: transparent; /* Remove white background */
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    outline: none;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    font-size: 12px;
+    padding: 2px 6px;
+    display: none;
+    z-index: 1000;
+}
+
+.reminder-dropdown {
+    position: absolute;
+    top: 45px;         /* move slightly down */
+    right: -80px;      /* shift left from the icon */
+    background-color: #1e1e1e;
+    color: #f1f1f1;
+    border: 1px solid #444;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    width: 320px;
+    max-height: 350px;
+    overflow-y: auto;
+    z-index: 999;
+    display: none;
+    padding: 0.5rem 0;
+    animation: fadeIn 0.25s ease-in-out;
+    backdrop-filter: blur(6px);
+}
+
+.reminder-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.reminder-list li {
+    padding: 12px 16px;
+    border-bottom: 1px solid #333;
+    font-size: 14px;
+    transition: background 0.2s;
+    word-wrap: break-word;
+}
+
+.reminder-list li:last-child {
+    border-bottom: none;
+}
+
+.reminder-list li:hover {
+    background-color: #2a2a2a;
+    cursor: pointer;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* For completed_tasks.html */
+.task-section {
+    background-color: #fff;
+    padding: 30px;
+    margin: 30px auto;
+    border-radius: 10px;
+    max-width: 900px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.completed-task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.task-desc.completed {
+    color: #546135;
+    font-weight: 500;
+    font-size: 16px;
+}
+
+.completed-time {
+    font-size: 14px;
+    color: #888;
+}
+
+.back-to-home {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 8px 14px;
+    background-color: #333;
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.back-to-home:hover {
+    background-color: #555;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background 0.2s;
+}
+
+.back-btn:hover {
+    background-color: #0056b3;
+}
+
+/* End of completed_tasks.html */
+
+/* For shared_tasks.html */
+.task-section {
+    background-color: #fff;
+    padding: 30px;/* 
+    margin: 30px auto; */
+    margin-top: -30px;
+    border-radius: 10px;
+    max-width: 900px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.shared-task-section {
+    background: #ddffdd;
+}
+.sharedtaskone {
+    background-color: #fff;
+    margin-top: 5px;
+}
+.open-shared-btn {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    margin: 20px 0;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-toggle:checked + .modal {
+    display: flex;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    width: 400px;
+    max-width: 95%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.modal-title {
+    margin-bottom: 20px;
+}
+
+.task-form textarea,
+.task-form input[type="date"],
+.task-form input[type="time"],
+.task-form input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+}
+
+.close-btn {
+    float: right;
+    color: red;
+    cursor: pointer;
+    font-size: 20px;
+    margin-top: 10px;
+}
+
+.completed-task-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.task-desc {
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.completed-time {
+    font-size: 14px;
+    color: #888;
+    margin-top: 4px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    font-size: 16px;
+    color: #e1688b;
+    cursor: pointer;
+}
+
+.suggestions-box {
+    background: #f9f9f9;
+    border: 1px solid #ccc;
+    max-height: 100px;
+    overflow-y: auto;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.suggestions-box div {
+    padding: 6px;
+    cursor: pointer;
+}
+
+.suggestions-box div:hover {
+    background-color: #e0e0e0;
+}
+
+.shared-task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.shared-task-details {
+    flex-grow: 1;
+}
+
+.complete-checkbox {
+    margin-top: 18px; /* optional tweak for alignment */
+}
+
+/* End of shared_tasks.html */
+
+/* For suggestions.html */
+.suggestion-heading {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #605a91;
+    text-align: center;
+}
+
+.suggestion-list {
+    list-style: none;
+    padding: 0;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.suggestion-item {
+    background-color: #a19cc2;
+    border-radius: 10px;
+    padding: 10px 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    transition: background-color 0.3s ease;
+}
+
+.suggestion-item:hover {
+    background-color: #cdc6ff;
+}
+
+.suggestion-text {
+    font-size: 1.1rem;
+    color: #222;
+    flex-grow: 1;
+}
+
+.add-task-form {
+    margin: 0;
+}
+
+.add-task-btn {
+    background-color: #d8a2b3;
+    border: none;
+    color: white;
+    padding: 8px 15px;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.25s ease;
+}
+
+.add-task-btn:hover {
+    background-color: rgb(217, 152, 173);
+}
+
+.no-suggestions {
+    text-align: center;
+    color: #777;
+    font-style: italic;
+    margin-top: 2rem;
+}
+
+/* End of suggestions.html */
