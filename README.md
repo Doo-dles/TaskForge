@@ -78,3 +78,12 @@ TaskForge/
 ## 📧 Contact
 
 Made with 💙 by [Doo-dles](https://github.com/Doo-dles)
+
+
+```
+
+📄 License
+
+Copyright © 2025 Doo-dlesAll rights reserved.
+
+This source code is provided for personal reference only.You may not copy, modify, distribute, or use this code without explicit written permission from the author.
