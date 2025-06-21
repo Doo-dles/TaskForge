@@ -68,9 +68,9 @@ TaskForge/
 ├── AI/                   # Python files for AI suggestions
 ├── static/               # CSS, JS, images
 ├── templates/            # HTML (Jinja) templates
+├── LICENSE               # License information
 ├── app.py                # Main Flask application
 ├── requirements.txt      # Python dependencies
-├── .gitignore            # Files to exclude from Git
 └── README.md             # This file
 
 ```
