@@ -1,12 +1,12 @@
-# 🧱 Core Flask & Extensions
+# Core Flask & Extensions
 from flask import Flask, flash, jsonify, redirect, render_template, request, url_for, session
 from flask_bcrypt import Bcrypt
 from flask_mail import Mail, Message
 
-# 🗃️ Database
+# Database
 import mysql.connector
 
-# 📅 Scheduling & Time
+# Scheduling & Time
 from datetime import datetime, timedelta
 from dateutil import parser as date_parser
 from dateutil.relativedelta import relativedelta
@@ -15,19 +15,19 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
-# 📊 Analytics & Plots
+# Analytics & Plots
 import matplotlib
 matplotlib.use('Agg')  # For non-GUI environments
 import matplotlib.pyplot as plt
 
-# 🧠 AI & Prediction
+# AI & Prediction
 from AI.suggestor import suggest_task_with_ml
 
-# 🔐 Auth & Google API
+# Auth & Google API
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 
-# 🛠️ Utilities
+# Utilities
 import os
 import math
 import re
@@ -47,7 +47,7 @@ db_config = {
     'host': 'localhost',
     'user': 'root',
     'password': '',
-    'database': 'db_name' 
+    'database': 'your_database_name' # e.g: taskforge.db
 }
 
 # Flask-Bcrypt for Password Hashing
@@ -65,6 +65,7 @@ app.config['MAIL_DEFAULT_SENDER'] = 'your-email@gmail.com'
 
 mail = Mail(app)
 
+# This creates a background scheduler to run tasks automatically 
 scheduler = BackgroundScheduler()
 
 # Shows the dashboard
