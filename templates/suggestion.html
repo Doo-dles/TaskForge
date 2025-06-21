@@ -1,0 +1,31 @@
+<!-- {% extends "layout.html" %}
+
+{% block title %}AI Task Suggestions{% endblock %}
+
+{% block content %}
+<h2 class="suggestion-heading">🔮 AI-Powered Task Suggestions</h2>
+
+{% if suggestions %}
+    <ul class="suggestion-list">
+        {% for suggestion in suggestions %}
+            <li class="suggestion-item">
+                <div class="suggestion-text">
+                    {{ suggestion.display_text }}
+                </div>
+                <form action="{{ url_for('add_suggested_task') }}" method="POST" style="margin-top: 10px;">
+                    <input type="hidden" name="description" value="{{ suggestion.description }}">
+                    <input type="hidden" name="category" value="{{ suggestion.category }}">
+                    <input type="hidden" name="priority" value="{{ suggestion.priority }}">
+                    {% if suggestion.due_datetime %}
+                        <input type="hidden" name="due_datetime" value="{{ suggestion.due_datetime }}">
+                    {% endif %}
+                    <button type="submit" class="add-task-btn">Add Task</button>
+                </form>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No suggestions available.</p>
+{% endif %}
+{% endblock %}
+ -->

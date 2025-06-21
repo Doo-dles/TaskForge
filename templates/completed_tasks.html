@@ -1,0 +1,71 @@
+{% extends "layout.html" %} 
+
+{% block title %}Completed Tasks{% endblock %}
+
+{% block content %}
+<body style="background: #fff0f5;">
+    
+<div class="task-section">
+    <h2>Daily Completed Tasks</h2>
+    {% if daily_completed_tasks %}
+        <ul class="completed-task-list">
+            {% for task in daily_completed_tasks %}
+                <li class="task-item">
+                    <input type="checkbox" checked disabled>
+                    <span class="task-desc completed">{{ task.description }}</span>
+                    <span class="completed-time">{{ task.created_at }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No daily completed tasks found.</p>
+    {% endif %}
+</div>
+<br>
+<div class="task-section">
+    <h2>Completed Tasks</h2>
+    {% if tasks %}
+        <ul class="completed-task-list">
+            {% for task in tasks %}
+                <li class="task-item">
+                    <input type="checkbox" checked disabled>
+                    <span class="task-desc completed" >{{ task.description }}</span>
+                    <span class="completed-time">{{ task.due_datetime }}</span>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No regular completed tasks found.</p>
+    {% endif %}
+</div>
+<br>
+<div class="task-section">
+    <h2>Completed Shared Tasks</h2>
+    <ul class="completed-task-list">
+        {% for task in completed_shared_tasks %}
+            <li class="task-item">
+                <input type="checkbox" checked disabled>
+                    <p class="task-desc completed">{{ task.description }}</p>
+    
+                    {% if task.completed_at %}
+                        <p class="completed-time">Completed at {{ task.completed_at }}</p>
+                    {% endif %}
+    
+                    <p class="completed-time">
+                        👥 Shared with:
+                        {% for username in task.shared_with %}
+                            {{ username }}{% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                </li>
+        {% else %}
+            <p>No completed shared tasks.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- <div class="back-to-home">
+    <a href="{{ url_for('index') }}" class="back-btn">Back to Home</a>
+</div> -->
+</body>
+{% endblock %}

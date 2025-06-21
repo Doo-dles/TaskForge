@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ category }} Tasks{% endblock %}
+
+{% block content %}
+
+    <div class="tasks-container">
+        <div class="category-header">
+            <h2>{{ category }} Tasks</h2>
+        </div>
+
+        {% if tasks %}
+            <ul class="task-list">
+                {% for task in tasks %}
+                    <li class="task-item">
+                        <!-- Completion Form -->
+                        <form method="POST" action="{{ url_for('mark_completed', task_id=task.id) }}" class="task-form">
+                            <input type="checkbox" onchange="this.form.submit()" class="task-checkbox">
+                        </form>
+
+                        <!-- Task Info -->
+                        <div class="task-content">
+                            <div class="task-desc">{{ task.description }}</div>
+                            {% if task.due_datetime %}
+                                <div class="task-date">📅 Due: {{ task.due_datetime.strftime("%b %d, %Y %I:%M %p") }}</div>
+                            {% endif %}
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="no-tasks">🚫 No incomplete tasks in this category.</p>
+        {% endif %}
+
+        <div class="back-link">
+            <a href="{{ url_for('index') }}" class="back-to-home">⬅ Back to Home</a>
+        </div>
+    </div>
+
+    <style>
+        .tasks-container {
+            padding: 30px;
+            max-width: 800px;
+            margin: auto;
+        }
+
+        .category-header h2 {
+            font-size: 28px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .task-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            transition: background-color 0.2s ease;
+        }
+
+        .task-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .task-form {
+            margin-right: 15px;
+        }
+
+        .task-checkbox {
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .task-content {
+            flex-grow: 1;
+        }
+
+        .task-desc {
+            font-size: 18px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .task-date {
+            font-size: 14px;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .no-tasks {
+            color: #888;
+            font-style: italic;
+            margin-top: 20px;
+        }
+
+        .back-link {
+            margin-top: 30px;
+            text-align: left;
+        }
+
+        .back-to-home {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+            transition: color 0.2s ease;
+        }
+
+        .back-to-home:hover {
+            color: #21618c;
+        }
+
+    </style>
+{% endblock %}

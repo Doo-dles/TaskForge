@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}" type="image/x-icon">
+</head>
+<body class="welcome-bg">
+
+    <div class="container welcome-container" style="width: 40%;">
+        <h1>Register</h1>
+        <form method="POST" action="{{ url_for('register') }}">
+            <label for="username" class="styled-label">Username:</label>
+            <input type="text" name="username" required placeholder="Enter Username">
+
+            <label for="email" class="styled-label" >Email:</label>
+            <input type="email" name="email" required class="styled-input" placeholder="Enter Email">
+
+            <label for="password" class="styled-label">Password:</label>
+            <input type="password" name="password" required class="styled-input" placeholder="Enter Password">
+            <br><br>
+            <button type="submit" class="welcome-btn" style="width: 50%;">Register</button>
+            <p></p>
+        </form>
+        <a href="{{ url_for('login') }}" class="styled-link">Already have an account? Log in here.</a>
+    </div>
+
+</body>
+</html>

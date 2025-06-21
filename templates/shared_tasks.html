@@ -1,0 +1,108 @@
+{% extends "layout.html" %}
+
+{% block title %}Shared Tasks{% endblock %}
+
+{% block content %} 
+<body style="background: #f0fff0;">
+    
+<div class="task-section shared-task-section">
+    <h2>📤 Shared Tasks</h2>
+
+    <!-- 🔘 Button to open modal -->
+    <label for="shared-task-modal" class="open-shared-btn" style="background: #e0849e;">Share a Task</label>
+
+    <!-- 🔲 Hidden Toggle Checkbox -->
+    <input type="checkbox" id="shared-task-modal" class="modal-toggle" hidden>
+    <!-- 📋 Modal -->
+    <div class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">👥Share a Task</h2>
+
+            <form method="POST" action="{{ url_for('create_shared_task') }}" class="task-form">
+                <label for="description">Task</label>
+                <textarea name="description" id="description" required placeholder="Enter your shared task..."></textarea>
+
+                <label for="due_date">Due Date</label>
+                <input type="date" name="due_date" id="due_date">
+
+                <label for="due_time">Due Time</label>
+                <input type="time" name="due_time" id="due_time">
+
+                <label for="shared_with">Share with</label>
+                <input type="text" id="user-search" placeholder="Search usernames..." autocomplete="off">
+                <div id="user-suggestions" class="suggestions-box"></div>
+
+                <input type="hidden" name="shared_with[]" id="selected-users">
+
+                <div class="priority-options">
+                    <label class="priority-btn urgent">
+                        <input type="radio" name="priority" value="Urgent" required>
+                        Urgent
+                    </label>
+                    <label class="priority-btn high">
+                        <input type="radio" name="priority" value="High">
+                        High
+                    </label>
+                    <label class="priority-btn medium">
+                        <input type="radio" name="priority" value="Medium">
+                        Medium
+                    </label>
+                    <label class="priority-btn low">
+                        <input type="radio" name="priority" value="Low">
+                        Low
+                    </label>
+                </div>
+                <button type="submit" class="submit-btn">Share Task</button>
+            </form>
+
+            <label for="shared-task-modal" class="close-btn">✖</label>
+        </div>
+    </div>
+
+    <ul class="completed-task-list">
+        {% for task in shared_tasks %}
+            <li class="task-item">
+                <div class="shared-task-row">
+                    <form action="{{ url_for('complete_shared_task', task_id=task.id) }}" method="POST">
+                        <input type="checkbox" onchange="this.form.submit()" class="complete-checkbox">
+                    </form>
+            
+                    <div class="shared-task-details">
+                        <p class="task-desc">{{ task.description }}</p>
+            
+                        <p class="completed-time">
+                            👥 Shared with:
+                            {% for username in task.shared_with %}
+                                {{ username }}{% if not loop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                    </div>
+                </div>
+
+                <p class="priority-label {{ task.priority | lower }}">
+                    {{ task.priority }}
+                </p>
+                <div class="task-meta" style="display: flex; gap: 10px; align-items: center; margin-left: 20rem;">
+                {% if task.due_date or task.due_time %}
+                    <p class="task-date">
+                    🕒Due: {% if task.due_date %} {{ task.due_date }} {% endif %}{% if task.due_time %} at {{ task.due_time }} {% endif %}
+                    </p>
+                {% endif %}
+                </div>
+                <form action="{{ url_for('delete_shared_task', task_id=task.id) }}" method="POST">
+                    <button type="submit" class="delete-btn" style="margin-top: 20px;">Delete</button>
+                </form>
+            </li>
+            
+        {% else %}
+            <p>No shared tasks yet.</p>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- Embed users list -->
+<div id="user-data" data-users='{{ all_users | tojson | safe }}'></div>
+
+<script src="{{ url_for('static', filename='js/shared_tasks.js') }}"></script>
+</body>
+{% endblock %}

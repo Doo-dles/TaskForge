@@ -1,0 +1,145 @@
+{% extends "layout.html" %}
+
+{% block title %}Predictive Analysis{% endblock %}
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+</head>
+<style>
+.container {
+    max-width: 800px;
+    margin-top: -30px;
+    margin: 40px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
+    display: block;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 30px;
+    font-weight: 700;
+    font-size: 2rem;
+}
+
+.insight-block {
+  background-color: #e8f4fa;
+  border-left: 6px solid #0d6efd;
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  font-weight: 500;
+  color: #333;
+}
+
+.day-section {
+    background: #f4f6f8;
+    padding: 15px 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: inset 0 0 5px #d9d9d9;
+    display: block; /* ensures vertical stacking */
+    margin-bottom: 20px;
+}
+
+.day-section h3 {
+    margin: 0;
+    color: #0d6efd;
+    font-size: 1.25rem;
+}
+
+p {
+    margin: 8px 0;
+}
+
+@media (max-width: 600px) {
+    .container {
+        padding: 20px;
+        margin: 20px;
+    }
+    h1 {
+        font-size: 1.5rem;
+    }
+    .day-section h3 {
+        font-size: 1.1rem;
+    }
+}
+
+</style>
+    <body style="background: #f0f8ff;">
+    <div class="container">
+        <h1>Weekly Task Analytics</h1>
+        <div style="background: #ddffdd; padding: 10px; border-radius: 10px;">
+        {% for day, tasks in data.items() %}
+            <h3>{{ day }} — {{ tasks|length }} completed</h3>
+            <ul>
+                {% if tasks %}
+                {% for task in tasks %}
+                    <li>{{ task.description }} 
+                        <small>({{ task.completed_at }})</small>
+                    </li>
+                {% endfor %}
+                {% else %}
+                <li>No tasks completed</li>
+                {% endif %}
+            </ul>
+        {% endfor %}
+        </div>
+    </div> <br>
+    <div class="container">
+        <div class="insights">
+        {% for message in insights %}
+            <div class="insight-block">
+            {{ message }}
+            </div>
+        {% endfor %}
+        </div>
+    </div>
+    <br>
+    <div class="container">
+        <canvas id="weeklyChart" width="600" height="400" style="background: #f4f6f8;"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function () {
+    const parsed = JSON.parse(`{{ data_json | tojson | safe }}`);
+    const labels = Object.keys(parsed);
+    const values = labels.map(day => parsed[day].length);
+
+    const ctx = document.getElementById('weeklyChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Tasks Completed',
+                data: values,
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0 }
+                }
+            }
+        }
+    });
+});
+</script>
+
+
+    
+</body>
+{% endblock %}

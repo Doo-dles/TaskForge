@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='images/logo.webp') }}" type="image/x-icon">
+</head>
+<body class="login-page welcome-bg">
+    <div class="container welcome-container">
+        <h1>Login</h1>  <!-- Now correctly positioned above the form -->
+        <form method="POST" action="{{ url_for('login') }}">
+            <label for="email" class="styled-label">Email:</label>
+            <input type="email" id="email" name="email" class="styled-input" placeholder="Enter your email">
+
+            <label for="password" class="styled-label">Password:</label>
+            <input type="password" id="password" name="password" required class="styled-input" placeholder="Enter your password">
+            <br><br>
+            <button type="submit" class="welcome-btn" style="width: 50%;">Login</button>
+        </form>
+        <div style="margin-top: 20px; text-align: center;">
+            <a href="{{ url_for('forgot_password') }}" class="styled-link">Forgot Password?</a>
+            <br><br>
+            <a href="{{ url_for('register') }}" class="styled-link">Create an Account</a>
+        </div>
+    </div>
+</body>
+
+</html>

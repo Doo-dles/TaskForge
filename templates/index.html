@@ -1,0 +1,233 @@
+{% extends "layout.html" %} 
+
+{% block title %}TaskForge{% endblock %}
+
+{% block content %}
+<body style="background-color: #fffff0;">
+    <h1 style="text-align: center; padding: 0px; color: #e89bad;">Welcome to TaskForge, {{ username }}!</h1>
+    <div class="main-dashboard" style="margin-top: -2%;">
+        <!-- 🌟 Left Section -->
+        <div class="left-section">
+            <!-- 🌟 Motivational Quote -->
+            <div class="motivation-quote">
+                “Push yourself, because no one else is going to do it for you.”
+            </div>
+
+            <!-- ✅ Tasks Container with Filter -->
+            <div class="tasks-wrapper">
+                <!-- 🎯 Filter Dropdown -->
+                <div class="filter-container">
+                    <label for="priorityFilter">Filter by Priority:</label>
+                    <select id="priorityFilter">
+                        <option value="all">All</option>
+                        <option value="urgent">Urgent</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                </div>
+
+                <!-- 📝 Tasks List -->
+                <div class="tasks-container" id="taskList" style="background: #e5d5d9;">
+                    {% for task in tasks %}
+                        <div class="task-row {% if task.status %}completed-task{% endif %} {{ task.priority | lower }}">
+                            <!-- Task content remains unchanged -->
+                            <form method="POST" action="{{ url_for('mark_completed', task_id=task.id) }}">
+                                <input type="checkbox" onchange="this.form.submit()" {% if task.status %}checked disabled{% endif %}>
+                            </form>
+                            <div class="task-desc">
+                                {{ task.description }}
+                                <p class="priority-label {{ task.priority | lower }}" style="margin-left: 3rem;">
+                                    {{ task.priority }}
+                                </p>
+                            </div>
+                            {% if task.due_datetime %}
+                            <div class="task-date" style="margin-right: 2rem;">
+                                {{ task.due_datetime }}
+                            </div>
+                            {% endif %}
+                            <div class="task-actions">
+                                <div class="dropdown">
+                                    <button class="dots-btn">⋮</button>
+                                    <div class="dropdown-content">
+                                        <form action="{{ url_for('delete_task', task_id=task.id, source='tasks') }}" method="POST">
+                                            <button type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            
+            <!-- Shared tasks container -->
+            <div class="tasks-wrapper">
+            <h4>Shared Tasks</h4>
+
+            <div class="filter-container">
+                <label for="priorityFilter">Filter by Priority:</label>
+                <select id="priorityFilter">
+                    <option value="all">All</option>
+                    <option value="urgent">Urgent</option>
+                    <option value="high">High</option>
+                    <option value="medium">Medium</option>
+                    <option value="low">Low</option>
+                </select>
+            </div>
+
+            <div class="tasks-container" id="taskList1" style="max-height: 300px; overflow-y: auto; background: #e5d5d9;">
+                {% if shared_tasks %}
+                    {% for task in shared_tasks %}
+                        <div class="task-row {% if task.status %}completed-task{% endif %} {{ task.priority | lower }}">
+                            <form action="{{ url_for('complete_shared_task', task_id=task.id) }}" method="POST">
+                                <input type="checkbox" onchange="this.form.submit()" class="complete-checkbox" {% if task.status %}checked disabled{% endif %}>
+                            </form>
+
+                            <div class="task-desc">
+                                {{ task.description }}
+                                <p class="priority-label {{ task.priority | lower }}" style="margin-left: 3rem;">
+                                    {{ task.priority }}
+                                </p>
+                                <p class="shared-label" style="font-size: 0.85rem; color: #888;">
+                                    👥 Shared with:
+                                    {% for username in task.shared_with %}
+                                        {{ username }}{% if not loop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                            </div>
+
+                            {% if task.due_date or task.due_time %}
+                            <div class="task-date" style="margin-right: 2rem;">
+                                🕒 Due:
+                                {% if task.due_date %} {{ task.due_date }} {% endif %}
+                                {% if task.due_time %} at {{ task.due_time }} {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <div class="task-actions">
+                                <div class="dropdown">
+                                    <button class="dots-btn">⋮</button>
+                                    <div class="dropdown-content">
+                                        <form action="{{ url_for('delete_shared_task', task_id=task.id) }}" method="POST">
+                                            <button type="submit">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="padding: 1rem;">No shared tasks yet.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        </div>
+
+        {% if not calendar_linked %}
+            <a href="{{ url_for('authorize') }}" style="text-align: end;">
+                <button class="connect-btn">Connect Google Calendar</button>
+            </a>
+        {% endif %}
+
+        <!-- 🚀 Right Section -->
+        <div class="dashboard-right" style="margin-top: 35px;">
+            <h5 class="suggestion-heading">You might want to add these!!</h5>
+            {% if suggestions %}
+                <ul class="suggestion-list">
+                    {% for suggestion in suggestions %}
+                        <li class="suggestion-item">
+                            <div class="suggestion-text">
+                                {{ suggestion.display_text }}
+                            </div>
+                            <form action="{{ url_for('add_suggested_task') }}" method="POST" style="margin-top: 10px;">
+                                <input type="hidden" name="description" value="{{ suggestion.description }}">
+                                <input type="hidden" name="category" value="{{ suggestion.category }}">
+                                <input type="hidden" name="priority" value="{{ suggestion.priority }}">
+                                {% if suggestion.due_datetime %}
+                                    <input type="hidden" name="due_datetime" value="{{ suggestion.due_datetime }}">
+                                {% endif %}
+                                <button type="submit" class="add-task-btn">Add Task</button>
+                            </form>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>No suggestions available.</p>
+            {% endif %}
+
+            <!-- Floating Button -->
+            <label for="add-task-modal" class="floating-btn">+</label>
+            <input type="checkbox" id="add-task-modal" class="modal-toggle" hidden>
+
+            <!-- Modal -->
+            <div class="modal">
+                <div class="modal-content">
+                    <h2 class="modal-title">📝 Add a New Task</h2>
+                    <form method="POST" action="{{ url_for('add_task') }}" class="task-form">
+                        <label for="description">Task</label>
+                        <textarea name="description" id="description" placeholder="Enter your task here..."></textarea>
+
+                        <label for="due_datetime">Due Date</label>
+                        <input type="datetime-local" name="due_datetime" id="due_datetime">
+
+                        <label for="category">Category</label>
+                        <input type="text" name="category" id="category" placeholder="e.g. Work, Study, Health">
+
+                        <label>Priority</label>
+                        <div class="priority-options">
+                            <label class="priority-btn urgent">
+                                <input type="radio" name="priority" value="Urgent" required>
+                                Urgent
+                            </label>
+                            <label class="priority-btn high">
+                                <input type="radio" name="priority" value="High">
+                                High
+                            </label>
+                            <label class="priority-btn medium">
+                                <input type="radio" name="priority" value="Medium" checked>
+                                Medium
+                            </label>
+                            <label class="priority-btn low">
+                                <input type="radio" name="priority" value="Low">
+                                Low
+                            </label>
+                        </div>
+
+                        <label>Recurring</label>
+                        <div class="recurring-options">
+                            <label class="recurring-btn none selected">
+                                <input type="radio" name="recurring" value="" checked>
+                                None
+                            </label>
+                            <label class="recurring-btn daily">
+                                <input type="radio" name="recurring" value="daily">
+                                Daily
+                            </label>
+                            <label class="recurring-btn weekly">
+                                <input type="radio" name="recurring" value="weekly">
+                                Weekly
+                            </label>
+                            <label class="recurring-btn monthly">
+                                <input type="radio" name="recurring" value="monthly">
+                                Monthly
+                            </label>
+                        </div>
+
+                        <label for="reminder">Reminder (optional)</label>
+                        <input type="datetime-local" id="reminder" name="reminder_datetime" />
+
+                        <button type="submit" class="submit-btn">Add Task</button>
+                    </form>
+                    <label for="add-task-modal" class="close-btn">✖</label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+
+</body>
+{% endblock %}

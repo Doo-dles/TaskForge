@@ -1,0 +1,54 @@
+{% extends "layout.html" %} 
+
+{% block title %}TaskForge{% endblock %}
+
+{% block content %}
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+</head>
+<body style="background:#fff5ee">
+    <div class="main-dashboard">
+        <div class="left-section">
+            <!-- Daily Tasks Section -->
+            <div class="daily-tasks-container">
+                <h2>Daily Tasks</h2>
+    
+                <!-- Add Task Form -->
+                <form method="POST" action="{{ url_for('add_daily_task') }}" class="add-task-form">
+                    <input type="text" name="description" placeholder="Enter a task..." required>
+                    <button type="submit" class="add-task-btn">Add Task</button>
+                </form>
+    
+                <!-- Daily Tasks List -->
+                <ul class="daily-task-list">
+                    {% for task in daily_tasks %}
+                    <li class="task-item">
+                        <form method="POST" action="{{ url_for('daily_mark_completed', task_id=task.id) }}">
+                            <input type="checkbox" onchange="this.form.submit()" {% if task.status %}checked{% endif %}>
+                        </form>
+                        <span class="task-desc {% if task.status %}completed{% endif %}">{{ task.description }}</span>
+                        <form action="{{ url_for('delete_daily_task', task_id=task.id) }}" method="POST">
+                            <button type="submit" class="delete-btn">Delete</button>
+                        </form>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        <div class="dashboard-right" style="width: 40%; margin-top: 50px;">
+            <div class="stats-container">
+                <h3>📊 Daily Stats</h3>
+                <p><strong>Total Tasks Today:</strong> {{ total_tasks_today }}</p>
+                <p><strong>Completed:</strong> {{ completed_today }}</p>
+            </div>
+
+            <div class="progress-chart">
+                <h4>Progress</h4>
+                <img src="data:image/png;base64,{{ pie_chart }}" alt="Pie Chart">
+                <p class="progress-percent-text">{{ progress_percent | int }}% Complete</p>
+            </div>
+        </div>
+    </div>
+</body>
+
+{% endblock %}
