@@ -1,6 +1,6 @@
-# TaskForge 🛠
+# Advanced To-DO List 🛠
 
-**TaskForge** is an advanced to-do list application designed to help users manage their tasks more efficiently with categorized task management, due dates, priorities, and reminders — all powered by a clean and intuitive interface.
+This is an advanced to-do list application designed to help users manage their tasks more efficiently with categorized task management, due dates, priorities, and reminders — all powered by a clean and intuitive interface.
 
 ---
 
@@ -41,8 +41,8 @@
 ### 🖥️ Clone the Repository
 
 ```bash
-git clone https://github.com/Doo-dles/TaskForge.git
-cd TaskForge
+git clone https://github.com/Doo-dles/ToDo.git
+cd ToDo
 ```
 
 ### 📥 Install Dependencies
