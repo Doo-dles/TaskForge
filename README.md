@@ -1,4 +1,4 @@
-# Advanced To-Do List 🛠
+# TaskForge
 
 This is an advanced to-do list application designed to help users manage their tasks more efficiently with categorized task management, due dates, priorities, and reminders — all powered by a clean and intuitive interface.
 
